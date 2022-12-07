@@ -160,6 +160,6 @@ fn execute(halt:&mut bool, ip:&mut usize, r0:&mut u8, r1:&mut u8, mem:&mut [u8;M
             }
             return;
         }
-        16_u8..=u8::MAX => { warn!("Non-implemented opcodes are being executed at IP: {}, check your jumps", *ip); }
+        16_u8..=u8::MAX => { warn!("Non-implemented opcodes are being executed at IP: {}, check your jumps", *ip); *ip = ip_plus_one; }
     }
 }
