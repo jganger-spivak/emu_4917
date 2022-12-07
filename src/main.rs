@@ -1,18 +1,23 @@
 use std::fs;
+use std::env;
+
+use log::{info, trace, warn};
+
 const INT_MAX:u8 = 15;
 const MEM_MAX:usize = 16;
 const DEBUG_MODE:bool = false;
 fn main() {
-    println!("Hello, world!");
+    let args: Vec<String> = env::args().collect();
     let mut mem:[u8; MEM_MAX] = [0; MEM_MAX];
     let mut halt = false;
     let mut ip:usize = 0;
     let mut r0:u8 = 0;
     let mut r1:u8 = 0;
     
-    load_from_file(&mut mem);
-    //load(&mut mem, 0, [4, 9, 1, 7]);
-    //load(&mut mem, 1, [4, 9, 1, 7]);
+    
+    
+    load_from_file(&mut mem, args.get(1).unwrap_or(&"program.txt".to_string()));
+    
     println!("Memory: {:?}", mem);
     
     while !halt {
@@ -29,8 +34,8 @@ fn main() {
     println!("Memory: {:?}", mem);
 }
 
-fn load_from_file(mem: &mut[u8]) {
-    let result = fs::read("./program.txt");
+fn load_from_file(mem: &mut[u8], filename: &String) {
+    let result = fs::read(filename);
     let code;
     match result {
         Ok(data) => { code = String::from_utf8_lossy(&data).parse::<String>().unwrap();}
@@ -82,78 +87,79 @@ fn execute(halt:&mut bool, ip:&mut usize, r0:&mut u8, r1:&mut u8, mem:&mut [u8;M
     if DEBUG_MODE {
         println!("X: {}", x);
     }
-    
-    if mem[*ip] == 0 {
-        println!("HALT! ");
-        *halt = true;
-    }
-    if mem[*ip] == 1 { //ADD R0, R1
-        *r0 = add_wrap(*r0, *r1);
-        *ip = ip_plus_one;
-    }
-    if mem[*ip] == 2 { //SUB R0, R1
-        *r0 = sub_wrap(*r0, *r1);
-        *ip = ip_plus_one;
-    }
-    if mem[*ip] == 3 { //INC R0
-        *r0 = add_wrap(*r0, 1);
-        *ip = ip_plus_one;
-    }
-    if mem[*ip] == 4 { //INC R1
-        *r1 = add_wrap(*r1, 1);
-        *ip = ip_plus_one;
-    }
-    if mem[*ip] == 5 { //DEC R0
-        *r0 = sub_wrap(*r0, 1);
-        *ip = ip_plus_one;
-    }
-    if mem[*ip] == 6 { //DEC R1
-        *r1 = sub_wrap(*r1, 1);
-        *ip = ip_plus_one;
-    }
-    if mem[*ip] == 7 { //BEL
-        println!("BEEP! ");
-        *ip = ip_plus_one;
-    }
-    if mem[*ip] == 8 { //PRN X
-        println!("{}", x);
-        *ip = ip_plus_two;
-    }
-    if mem[*ip] == 9 { //LDA R0, X
-        *r0 = x;
-        *ip = ip_plus_two;
-    }
-    if mem[*ip] == 10 { //LDA R1, X
-        *r1 = x;
-        *ip = ip_plus_two;
-    }
-    if mem[*ip] == 11 { //STO R0, X
-        mem[ip_plus_one] = *r0;
-        *ip = ip_plus_two;
-    }
-    if mem[*ip] == 12 { //STO R1, X
-        mem[ip_plus_one] = *r1;
-        *ip = ip_plus_two;
-    }
-    if mem[*ip] == 13 { //JMP X
-        *ip = x as usize;
-        return;
-    }
-    if mem[*ip] == 14 { //JMZ X
-        if *r0 == 0 {
-            *ip = x as usize;
-        } else {
-            *ip = ip_plus_two
+    match mem[*ip] {
+        0 => { //HLT
+            println!("HALT! ");
+            *halt = true;
         }
-        return;
-    }
-    if mem[*ip] == 15 { //JNZ X
-        if *r0 != 0 {
-            *ip = x as usize;
-        } else {
-            *ip = ip_plus_two
+        1 => { //ADD R0, R1
+            *r0 = add_wrap(*r0, *r1);
+            *ip = ip_plus_one;
         }
-        return;
+        2 => { //SUB R0, R1
+            *r0 = sub_wrap(*r0, *r1);
+            *ip = ip_plus_one;
+        }
+        3 => { //INC R0
+            *r0 = add_wrap(*r0, 1);
+            *ip = ip_plus_one;
+        }
+        4 => { //INC R1
+            *r1 = add_wrap(*r1, 1);
+            *ip = ip_plus_one;
+        }
+        5 => { //DEC R0
+            *r0 = sub_wrap(*r0, 1);
+            *ip = ip_plus_one;
+        }
+        6 => { //DEC R1
+            *r1 = sub_wrap(*r1, 1);
+            *ip = ip_plus_one;
+        }
+        7 => { //BEL
+            println!("BEEP! ");
+            *ip = ip_plus_one;
+        }
+        8 => { //PRN X
+            println!("{}", x);
+            *ip = ip_plus_two;
+        }
+        9 => { //LDA R0, X
+            *r0 = x;
+            *ip = ip_plus_two;
+        }
+        10 => { //LDA R1, X
+            *r1 = x;
+            *ip = ip_plus_two;
+        }
+        11 => { //STO R0, X
+            mem[ip_plus_one] = *r0;
+            *ip = ip_plus_two;
+        }
+        12 => { //STO R1, X
+            mem[ip_plus_one] = *r1;
+            *ip = ip_plus_two;
+        }
+        13 => { //JMP X
+            *ip = x as usize;
+            return;
+        }
+        14 => { //JMZ X
+            if *r0 == 0 {
+                *ip = x as usize;
+            } else {
+                *ip = ip_plus_two
+            }
+            return;
+        }
+        15 => { //JNZ X
+            if *r0 != 0 {
+                *ip = x as usize;
+            } else {
+                *ip = ip_plus_two
+            }
+            return;
+        }
+        16_u8..=u8::MAX => { warn!("Non-implemented opcodes are being executed at IP: {}, check your jumps", *ip); }
     }
-    
 }
