@@ -1,0 +1,3 @@
+DEC R0
+SR0 3
+HLT
