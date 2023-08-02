@@ -18,10 +18,16 @@ fn main() {
 
     let file = fs::read_to_string("program.4917");
     match file {
-        Ok(data) => { 
-            println!("Compiled the file: \n{}\n into {:?}", data, asm::assemble(data.as_str()));
-         },
-        Err(msg) => {eprintln!("{}", msg.to_string())}
+        Ok(data) => {
+            println!(
+                "Compiled the file: \n{}\n into {:?}",
+                data,
+                asm::assemble(data.as_str())
+            );
+        }
+        Err(msg) => {
+            eprintln!("{}", msg.to_string())
+        }
     }
 
     load_from_file(&mut mem, args.get(1).unwrap_or(&"program.txt".to_string()));

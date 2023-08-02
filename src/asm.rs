@@ -7,7 +7,7 @@ pub fn assemble(file: &str) -> Vec<u8> {
     for line in lines {
         line_num += 1;
         if line.contains("DB ") {
-            let val:u8 = line.replace("DB ", "").parse().unwrap();
+            let val: u8 = line.replace("DB ", "").parse().unwrap();
             result.push(val);
             continue;
         }
@@ -48,43 +48,43 @@ pub fn assemble(file: &str) -> Vec<u8> {
             continue;
         }
         if line.contains("LR0 ") {
-            let val:u8 = line.replace("LR0 ", "").parse().unwrap();
+            let val: u8 = line.replace("LR0 ", "").parse().unwrap();
             result.push(9);
             result.push(val);
             continue;
         }
         if line.contains("LR1 ") {
-            let val:u8 = line.replace("LR1 ", "").parse().unwrap();
+            let val: u8 = line.replace("LR1 ", "").parse().unwrap();
             result.push(10);
             result.push(val);
             continue;
         }
         if line.contains("SR0 ") {
-            let val:u8 = line.replace("SR0 ", "").parse().unwrap();
+            let val: u8 = line.replace("SR0 ", "").parse().unwrap();
             result.push(11);
             result.push(val);
             continue;
         }
         if line.contains("SR1 ") {
-            let val:u8 = line.replace("SR1 ", "").parse().unwrap();
+            let val: u8 = line.replace("SR1 ", "").parse().unwrap();
             result.push(12);
             result.push(val);
             continue;
         }
         if line.contains("JMP ") {
-            let val:u8 = line.replace("JMP ", "").parse().unwrap();
+            let val: u8 = line.replace("JMP ", "").parse().unwrap();
             result.push(13);
             result.push(val);
             continue;
         }
         if line.contains("JMZ ") {
-            let val:u8 = line.replace("JMZ ", "").parse().unwrap();
+            let val: u8 = line.replace("JMZ ", "").parse().unwrap();
             result.push(14);
             result.push(val);
             continue;
         }
         if line.contains("JNZ ") {
-            let val:u8 = line.replace("JNZ ", "").parse().unwrap();
+            let val: u8 = line.replace("JNZ ", "").parse().unwrap();
             result.push(15);
             result.push(val);
             continue;
